@@ -32,6 +32,13 @@
                 border: none;
                 cursor: pointer;
             }
+            .cancel-button {
+                background-color: #ff0000;
+                color: white;
+                padding: 6px 12px;
+                border: none;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -44,10 +51,19 @@
             var jsonData;
             var temporaryData;
             var query = "";
-            const url = "http://localhost/diu-routine/data.php?";
-            const bookingURL = "http://localhost/diu-routine/book.php?";
-            const temporaryUrl =
-                "http://localhost/diu-routine/temporary-class.php?";
+            var teacher;
+            fetch("./teacher.php")
+                .then((response) => response.text())
+                .then((result) => {
+                    teacher = result;
+                })
+                .catch((error) => {
+                    alert("Error:" + error);
+                });
+            const url = "./data.php?";
+            const bookingURL = "./book.php?";
+            const temporaryUrl = "./temporary-class.php?";
+            const cancelURL = "./cancel.php?";
             const input = document.getElementById("data");
             const routineTable = document.getElementById("class-routine");
 
@@ -110,11 +126,15 @@
                                 if (coursesInSlotAndRoom.length > 0) {
                                     coursesInSlotAndRoom.forEach(
                                         (courseInfo) => {
+                                            console.log(courseInfo);
                                             const courseDiv =
                                                 document.createElement("div");
                                             courseDiv.innerHTML = `${courseInfo.course}<br>${courseInfo.teacher}<br>${courseInfo.batch}`;
                                             if (courseInfo.date) {
                                                 courseDiv.innerHTML += `<br><span style="color:red">Date: ${courseInfo.date}</a>`;
+                                                if(courseInfo.teacher == teacher){
+                                                    courseDiv.innerHTML += `<br><button class="cancel-button" onclick="cancel('${courseInfo.day}','${courseInfo.slot}','${courseInfo.room}')">Cancel</button> </a>`;
+                                                }
                                             }
                                             cell.appendChild(courseDiv);
                                         }
@@ -149,6 +169,7 @@
                 //alert(`Booking Room ${room_no}, Slot ${slot}, Day ${day}`);
                 //const url = "https://google.com";
                 //window.open(url, '_blank', features);
+                let classtype = prompt("Enter booking type:\n 1. Makeup class\n2. Extra class");
                 let course = prompt("Enter course code: ");
                 let batch = prompt("Enter batch no: ");
 
@@ -164,6 +185,27 @@
                         slot +
                         "&room=" +
                         room_no
+                )
+                    .then((response) => response.text())
+                    .then((result) => {
+                        alert(result);
+                        handleSubmit();
+                    })
+                    .catch((error) => {
+                        alert("Error:" + error);
+                    });
+            }
+
+            function cancel(day, slot, room) {
+                
+                fetch(
+                    cancelURL +
+                        "day=" +
+                        day +
+                        "&slot=" +
+                        slot +
+                        "&room=" +
+                        room
                 )
                     .then((response) => response.text())
                     .then((result) => {
