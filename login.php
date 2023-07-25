@@ -5,7 +5,7 @@
         session_start();
         require './db-connect.php';
 
-        $teacher =  strtoupper($_POST['initial']);
+        $teacher =  strtoupper($_POST['initial']);;;;;;;;;
         $query = "SELECT Distinct teacher FROM `diu_routine` where teacher = '" . $teacher . "'";
 
         if (mysqli_num_rows(sql($query)) == 1) {
@@ -20,7 +20,7 @@
 
  <body>
      <form method="POST" enctype="multipart/form-data">
-         <input type="text" name="initial" />
+         <input type="text" name="initial" placeholder="Enter Teacher's initial"/>
          <input type="submit" value="Login" />
          <a href="day-slot-view.html"> View routine</a>
      </form>

@@ -48,7 +48,7 @@
         <script>
             var jsonData;
             var query = "";
-            const url = "http://localhost/diu-routine/data.php?";
+            const url = "./data.php?";
             const input = document.getElementById("data");
             const routineTable = document.getElementById("class-routine");
 
@@ -78,20 +78,20 @@
 
             function createTableRow(day, slots) {
                 let row = "<tr><td>" + day + "</td>";
-                for (let i = 1; i <= 8; i++) {
+                for (let i = 1; i <= 9; i++) {
                     let courses = slots.filter((slot) => slot.slot == i); 
                     if (courses.length > 0) {
                         row += "<td>";
                         courses.forEach((course, index) => {
                             row +=
                                 course.course +
-                                " - " +
+                                "<br>" +
                                 course.teacher +
-                                " (Room " +
+                                "<br>Room " +
                                 course.room +
-                                ", Batch " +
+                                "<br>Batch " +
                                 course.batch +
-                                ")";
+                                "";
                             if (index < courses.length - 1) {
                                 row += "<hr>";
                             }
@@ -119,7 +119,7 @@
             function createTable(dataArray) {
                 const groupedData = groupByDay(dataArray);
                 let table =
-                    "<table><thead><tr><th>Days/Slots</th><th>Slot 1</th><th>Slot 2</th><th>Slot 3</th><th>Slot 4</th><th>Slot 5</th><th>Slot 6</th><th>Slot 7</th><th>Slot 8</th></tr></thead><tbody>";
+                    "<table><thead><tr><th>Days/Slots</th><th>Slot 1</th><th>Slot 2</th><th>Slot 3</th><th>Slot 4</th><th>Slot 5</th><th>Slot 6</th><th>Slot 7</th><th>Slot 8</th><th>Slot 9</th></tr></thead><tbody>";
 
                 for (const [day, slots] of Object.entries(groupedData)) {
                     table += createTableRow(day, slots);

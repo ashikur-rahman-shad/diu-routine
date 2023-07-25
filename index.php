@@ -22,7 +22,7 @@
         for ($i = 1; $i < $rowCount; $i++) {
             $query .= ", ('" . $dataArray[$i][0] . "', '" . $dataArray[$i][1] . "', '" . $dataArray[$i][2] . "', '" . $dataArray[$i][3] . "', '" . $dataArray[$i][4] . "', '" . $dataArray[$i][5] . "')";
         }
-        echo $rowCount . "<br>";
+        echo "<br>". $rowCount . "<br>";
 
         if (sql($query)) {
             echo "New record created successfully";
