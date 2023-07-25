@@ -4,7 +4,7 @@ session_start();
 
 $message = "You are not eligible to make these changes";
 
-if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) && isset($_GET['room']) && isset($_GET['course']) && isset($_GET['batch'])) {
+if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) && isset($_GET['room']) && isset($_GET['course']) && isset($_GET['batch']) && isset($_GET['classtype'])) {
 
     require './db-connect.php';
     date_default_timezone_set('Asia/Dhaka');
@@ -21,11 +21,16 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
     $day = strtolower($_GET['day']);
     $slot = $_GET['slot'];
     $room = $_GET['room'];
-    $course = $_GET['course'];
+    $course = strtoupper($_GET['course']);
     $batch = $_GET['batch'];
     $teacher = $_SESSION['teacher'];
+    $classtype = $_GET['classtype'];
 
-    if (in_array($day, $daysOfWeek) && in_array($slot, $slots) && in_array($room, $rooms)) {
+    if (empty($course) or empty($batch) or empty($classtype))
+        $message = "You must enter class type, course name, and batch no";
+    else if (
+        in_array($day, $daysOfWeek) && in_array($slot, $slots) && in_array($room, $rooms)
+    ) {
 
 
         $query = "SELECT * FROM `diu_routine` where 
@@ -60,10 +65,10 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
                     $nextDate = date('Y-m-d', strtotime("+7 days", strtotime($nextDate)));
 
 
-                $query = "INSERT INTO `off_routine_class` (`day`, `slot`, `room`, `course`, `teacher`, `batch`, `date`) VALUES ('" . $day . "', '" . $slot . "', '" . $room . "', '" . $course . "', '" . $teacher . "', '" . $batch . "', '" . $nextDate . "') ";
+                $query = "INSERT INTO `off_routine_class` (`day`, `slot`, `room`, `course`, `teacher`, `batch`, `date`, `classtype`) VALUES ('" . $day . "', '" . $slot . "', '" . $room . "', '" . $course . "', '" . $teacher . "', '" . $batch . "', '" . $nextDate . "', '" . $classtype . "'  ) ";
 
                 if (sql($query))
-                    $message = "Room $room booked successfully on  $nextDate, $day, Slot $slot";
+                    $message = "$classtype class successfully booked on  $day, $nextDate at Room $room, Slot $slot";
                 else
                     $message = "Database error";
             }

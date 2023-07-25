@@ -131,8 +131,12 @@
                                                 document.createElement("div");
                                             courseDiv.innerHTML = `${courseInfo.course}<br>${courseInfo.teacher}<br>${courseInfo.batch}`;
                                             if (courseInfo.date) {
-                                                courseDiv.innerHTML += `<br><span style="color:red">Date: ${courseInfo.date}</a>`;
-                                                if(courseInfo.teacher == teacher){
+                                                courseDiv.innerHTML += `<br><span style="color:red">(${courseInfo.classtype} class) <br>Date: ${courseInfo.date}</a>`;
+
+                                                if (
+                                                    courseInfo.teacher ==
+                                                    teacher
+                                                ) {
                                                     courseDiv.innerHTML += `<br><button class="cancel-button" onclick="cancel('${courseInfo.day}','${courseInfo.slot}','${courseInfo.room}')">Cancel</button> </a>`;
                                                 }
                                             }
@@ -169,9 +173,14 @@
                 //alert(`Booking Room ${room_no}, Slot ${slot}, Day ${day}`);
                 //const url = "https://google.com";
                 //window.open(url, '_blank', features);
-                let classtype = prompt("Enter booking type:\n 1. Makeup class\n2. Extra class");
+                let classtype = prompt(
+                    "Enter booking type:\n 1. Makeup class\n2. Extra class"
+                );
                 let course = prompt("Enter course code: ");
                 let batch = prompt("Enter batch no: ");
+
+                if (classtype == "1") classtype = "makeup";
+                else if (classtype == "2") classtype = "extra";
 
                 fetch(
                     bookingURL +
@@ -184,7 +193,9 @@
                         "&slot=" +
                         slot +
                         "&room=" +
-                        room_no
+                        room_no +
+                        "&classtype=" +
+                        classtype
                 )
                     .then((response) => response.text())
                     .then((result) => {
@@ -197,15 +208,8 @@
             }
 
             function cancel(day, slot, room) {
-                
                 fetch(
-                    cancelURL +
-                        "day=" +
-                        day +
-                        "&slot=" +
-                        slot +
-                        "&room=" +
-                        room
+                    cancelURL + "day=" + day + "&slot=" + slot + "&room=" + room
                 )
                     .then((response) => response.text())
                     .then((result) => {
