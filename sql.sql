@@ -17,6 +17,7 @@ CREATE TABLE `off_routine_class` (
     `course` VARCHAR(10) NOT NULL,
     `teacher` VARCHAR(10) NOT NULL,
     `batch` VARCHAR(5) NOT NULL,
+    `classtype` VARCHAR(10) NOT NULL,
     `date` date,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
