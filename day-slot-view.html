@@ -41,6 +41,7 @@
             Student
         </label>
         <input type="text" id="data" placeholder="Enter batch" />
+        <input type="text" id="section" placeholder="Enter Section" />
         <button onclick="handleSubmit()">Submit</button>
         <a href="room-slot-view.html">Room Allocation</a>
         <div id="class-routine"></div>
@@ -50,12 +51,19 @@
             var query = "";
             const url = "./data.php?";
             const input = document.getElementById("data");
+            const section = document.getElementById("section");
             const routineTable = document.getElementById("class-routine");
 
             function updatePlaceholder(x) {
                 input.value = "";
-                if (x == "t") input.placeholder = "Enter Initial";
-                else input.placeholder = "Enter batch no";
+                if (x == "t") {
+                    input.placeholder = "Enter Initial";
+                    section.style.display = "none";
+                } else {
+                    input.placeholder = "Enter batch no";
+                    section.style.display = "inline-block";
+                }
+                section.placeholder = "Enter Section";
             }
 
             function handleSubmit() {
@@ -63,9 +71,13 @@
                     'input[name="role"]:checked'
                 );
 
-                if (selectedRole.value == "teacher")
+                if (selectedRole.value == "teacher") {
                     query = url + "teacher=" + input.value;
-                else query = url + "batch=" + input.value;
+                } else {
+                    query = url + "batch=" + input.value;
+                    if (section.value.replace(/\s/g, "") != "")
+                        query += "&section=" + section.value.replace(/\s/g, "");
+                }
 
                 console.log(query);
                 fetch(query)
@@ -79,7 +91,7 @@
             function createTableRow(day, slots) {
                 let row = "<tr><td>" + day + "</td>";
                 for (let i = 1; i <= 9; i++) {
-                    let courses = slots.filter((slot) => slot.slot == i); 
+                    let courses = slots.filter((slot) => slot.slot == i);
                     if (courses.length > 0) {
                         row += "<td>";
                         courses.forEach((course, index) => {
