@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Class Routine</title>
         <style>
             table {
                 border-collapse: collapse;
@@ -41,10 +40,23 @@
             }
         </style>
     </head>
-    <body>
+    <body style="text-align: center">
+        <div>
+            <h1>DIU Routine -SWE</h1>
+            <div class="top-navigation">
+                <a href="./login.php"> Login</a> &bull;
+                <a href="./"> Home</a> &bull;
+                <a href="./dashboard.html"> Dashboard</a> &bull;
+                <a href="./day-slot-view.html"> Day wise routine</a> &bull;
+                <a href="./room-slot-view.html"> Room wise routine</a> &bull;
+                <br />
+                <br />
+            </div>
+        </div>
+
         <input type="text" id="data" placeholder="Enter Day" />
         <button onclick="handleSubmit()">Submit</button>
-        <a href="day-slot-view.html">Daily Routine</a>
+
         <div id="class-routine"></div>
 
         <script>
@@ -126,7 +138,6 @@
                                 if (coursesInSlotAndRoom.length > 0) {
                                     coursesInSlotAndRoom.forEach(
                                         (courseInfo) => {
-                                            console.log(courseInfo);
                                             const courseDiv =
                                                 document.createElement("div");
                                             courseDiv.innerHTML = `${courseInfo.course}<br>${courseInfo.teacher}<br>${courseInfo.batch}`;
@@ -182,21 +193,24 @@
                 if (classtype == "1") classtype = "makeup";
                 else if (classtype == "2") classtype = "extra";
 
-                fetch(
+                let booking =
                     bookingURL +
-                        "batch=" +
-                        batch +
-                        "&course=" +
-                        course +
-                        "&day=" +
-                        day +
-                        "&slot=" +
-                        slot +
-                        "&room=" +
-                        room_no +
-                        "&classtype=" +
-                        classtype
-                )
+                    "batch=" +
+                    batch +
+                    "&course=" +
+                    course +
+                    "&day=" +
+                    day +
+                    "&slot=" +
+                    slot +
+                    "&room=" +
+                    room_no +
+                    "&classtype=" +
+                    classtype;
+
+                console.log(booking);
+
+                fetch(booking)
                     .then((response) => response.text())
                     .then((result) => {
                         alert(result);

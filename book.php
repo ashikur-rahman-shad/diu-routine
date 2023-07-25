@@ -10,7 +10,7 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
     date_default_timezone_set('Asia/Dhaka');
 
     $daysOfWeek = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
-    $slots = [1, 2, 3, 4, 5, 6, 7, 8];
+    $slots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     $result = sql("SELECT DISTINCT room FROM `diu_routine`;");
     $rooms = array();
@@ -26,8 +26,13 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
     $teacher = $_SESSION['teacher'];
     $classtype = $_GET['classtype'];
 
-    if (empty($course) or empty($batch) or empty($classtype))
+    if (
+        empty($course) || empty($batch) || empty($classtype)
+        or
+        $course == "null" || $batch == "null" || $classtype == "null"
+    )
         $message = "You must enter class type, course name, and batch no";
+
     else if (
         in_array($day, $daysOfWeek) && in_array($slot, $slots) && in_array($room, $rooms)
     ) {

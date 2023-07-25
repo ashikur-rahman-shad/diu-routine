@@ -20,7 +20,20 @@
             }
         </style>
     </head>
-    <body>
+    <body style="text-align: center;">
+        <div>
+            <h1>DIU Routine -SWE</h1>
+            <div class="top-navigation">
+                <a href="./login.php"> Login</a> &bull;
+                <a href="./"> Home</a> &bull;
+                <a href="./dashboard.html"> Dashboard</a> &bull;
+                <a href="./day-slot-view.html"> Day wise routine</a> &bull;
+                <a href="./room-slot-view.html"> Room wise routine</a> &bull;
+                <br />
+                <br />
+            </div>
+        </div>
+
         <label>
             <input
                 type="radio"
@@ -43,7 +56,6 @@
         <input type="text" id="data" placeholder="Enter batch" />
         <input type="text" id="section" placeholder="Enter Section" />
         <button onclick="handleSubmit()">Submit</button>
-        <a href="room-slot-view.html">Room Allocation</a>
         <div id="class-routine"></div>
 
         <script>
@@ -76,7 +88,9 @@
                 } else {
                     query = url + "batch=" + input.value;
                     if (section.value.replace(/\s/g, "") != "")
-                        query += "&section=" + section.value.replace(/\s/g, "");
+                        query +=
+                            "&section=" +
+                            section.value.replace(/\s/g, "").toUpperCase();
                 }
 
                 console.log(query);
