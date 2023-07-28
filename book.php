@@ -9,7 +9,7 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
     require './db-connect.php';
     date_default_timezone_set('Asia/Dhaka');
 
-    $daysOfWeek = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
+    $daysOfWeek = array('SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY');
     $slots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     $result = sql("SELECT DISTINCT room FROM `diu_routine`;");
@@ -18,7 +18,7 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
         $rooms[] = $r['room'];
     }
 
-    $day = strtolower($_GET['day']);
+    $day = strtoupper($_GET['day']);
     $slot = $_GET['slot'];
     $room = $_GET['room'];
     $course = strtoupper($_GET['course']);
@@ -59,8 +59,8 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
                 $inputDay = $day;
                 $currentDate = date('Y-m-d');
 
-                $daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-                $currentDayOfWeek = strtolower(date('l', strtotime($currentDate)));
+               
+                $currentDayOfWeek = strtoupper(date('l', strtotime($currentDate)));
 
                 $daysToAdd = (array_search($inputDay, $daysOfWeek) - array_search($currentDayOfWeek, $daysOfWeek) + 7) % 7;
 

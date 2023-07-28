@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             table {
                 border-collapse: collapse;
@@ -41,29 +41,12 @@
                 <br />
             </div>
         </div>
-        <label>
-            <input
-                type="radio"
-                name="role"
-                onchange="updatePlaceholder('t')"
-                value="teacher"
-            />
-            Teacher
-        </label>
-        <label>
-            <input
-                type="radio"
-                name="role"
-                onchange="updatePlaceholder('s')"
-                value="student"
-                checked
-            />
-            Student
-        </label>
-        <input type="text" id="data" placeholder="Enter batch" />
-        <input type="text" id="section" placeholder="Enter Section" />
-        <button onclick="handleSubmit()">Submit</button>
+
         <div id="class-routine"></div>
+        <h2>Makeup classes</h2>
+        <div id="makeup-class"></div>
+        <h2>Extra classes</h2>
+        <div id="extra-class"></div>
 
         <script>
             var jsonData;
@@ -71,7 +54,6 @@
             var query = "";
             const url = "./data.php?";
             const temporaryUrl = "./temporary-class.php?";
-            const input = document.getElementById("data");
             const section = document.getElementById("section");
             const routineTable = document.getElementById("class-routine");
 
@@ -80,47 +62,16 @@
                 .then((response) => response.text())
                 .then((result) => {
                     teacher = result;
+                    handleSubmit();
                 })
                 .catch((error) => {
                     alert("Error:" + error);
                 });
 
-            function updatePlaceholder(x) {
-                input.value = "";
-                if (x == "t") {
-                    input.placeholder = "Enter Initial";
-                    section.style.display = "none";
-                } else {
-                    input.placeholder = "Enter batch no";
-                    section.style.display = "inline-block";
-                }
-                section.placeholder = "Enter Section";
-            }
-
             function handleSubmit() {
-                const selectedRole = document.querySelector(
-                    'input[name="role"]:checked'
-                );
+                query = url + "teacher=" + teacher;
+                temporaryQuery = temporaryUrl + "teacher=" + teacher;
 
-                if (selectedRole.value == "teacher") {
-                    query = url + "teacher=" + input.value;
-                    temporaryQuery = temporaryUrl + "teacher=" + input.value;
-                } else {
-                    query = url + "batch=" + input.value;
-                    temporaryQuery = temporaryUrl + "batch=" + input.value;
-                    if (section.value.replace(/\s/g, "") != "") {
-                        query +=
-                            "&section=" +
-                            section.value.replace(/\s/g, "").toUpperCase();
-                        temporaryQuery +=
-                            "&section=" +
-                            section.value.replace(/\s/g, "").toUpperCase();
-                    }
-                }
-
-                console.log(query);
-                console.log(temporaryQuery);
-                
                 // Fetch data from both URLs concurrently using Promise.all
                 Promise.all([
                     fetch(query).then((response) => response.json()),
@@ -158,7 +109,7 @@
                         row += "<td>";
                         row += courses
                             .map((course) => {
-                                let courseInfo = `${course.course} <br> ${course.teacher} <br> Room ${course.room} <br> Batch ${course.batch}`;
+                                let courseInfo = `${course.course} <br> Batch ${course.batch} <br>  (${course.room})`;
                                 if (course.classtype && course.date) {
                                     courseInfo += `<br><span style="color:red">(${course.classtype} class) <br>Date: ${course.date}</span>`;
                                     if (course.teacher == teacher) {
@@ -214,6 +165,7 @@
                         alert("Error:" + error);
                     });
             }
+            
         </script>
     </body>
 </html>

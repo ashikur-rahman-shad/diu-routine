@@ -1,19 +1,28 @@
- 
 <?php
 
-$query = "SELECT * FROM `off_routine_class` ";
+$query = "SELECT * FROM `diu_routine` ";
 
 $options = "";
 
 if (isset($_GET['day'])) $options .= "and day like '" . $_GET['day'] . "'";
-if (isset($_GET['slot'])) $options .= "and slot like  '" . $_GET['slot'] . "'";
+if (isset($_GET['slot'])) $options .= "and slot = '" . $_GET['slot'] . "'";
 if (isset($_GET['room'])) $options .= "and room like  '" . $_GET['room'] . "'";
 if (isset($_GET['course'])) $options .= "and course like  '" . $_GET['course'] . "'";
-if (isset($_GET['teacher'])) $options .= "and teacher like  '" . $_GET['teacher'] . "'";
-if (isset($_GET['classtype'])) $options .= "and classtype like '" . $_GET['classtype'] . "'";
+if (isset($_GET['teacher']) && isset($_GET['batch'])) {
+    $options .= "and (teacher like  '" . $_GET['teacher'] . "' or(batch=";
+
+}
+//if (isset($_GET['classtype'])) $options .= "and classtype like '" . $_GET['classtype'] . "'";
 if (isset($_GET['batch'])) {
     $options .= "and batch like " . $_GET['batch'];
-    if (isset($_GET['section'])) $options .= " and course REGEXP '^[A-Z]+[0-9]+([" . strtoupper($_GET['section']) . "])?([0-9])?$'";
+    if (isset($_GET['section'])) {
+
+        if (isset($_GET['group'])) {
+            $options .= " or course REGEXP '^[A-Z]+[0-9]+([" . strtoupper($_GET['section']) . "])?([" . $_GET['group'] . "])?$'";
+        } else {
+            $options .= " or course REGEXP '^[A-Z]+[0-9]+([" . strtoupper($_GET['section']) . "])?([0-9])?$'";
+        }
+    };
 }
 
 
@@ -25,7 +34,7 @@ if (count_chars($options)) {
     require './db-connect.php';
     $rows = array();
     $options = substr($options, 4);
-    $query .= " where " . $options . " and `date`>='" . date("Y-m-d") . "'";
+    $query .= " where " . $options; //. " and `date`>='" . date("Y-m-d") . "'";
     //echo $query;
     $result = sql($query);
     $rows = array();
