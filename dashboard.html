@@ -1,34 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            table {
-                border-collapse: collapse;
-                width: 100%;
-                text-align: center;
-            }
-
-            table,
-            th,
-            td {
-                border: 1px solid black;
-            }
-
-            th,
-            td {
-                padding: 10px;
-            }
-            .cancel-button {
-                background-color: #ff0000;
-                color: white;
-                padding: 6px 12px;
-                border: none;
-                cursor: pointer;
-            }
-        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="complete.css" />
     </head>
-    <body style="text-align: center">
+    <body>
         <div>
             <h1>DIU Routine - SWE</h1>
             <div class="top-navigation">
@@ -109,12 +85,19 @@
                         row += "<td>";
                         row += courses
                             .map((course) => {
-                                let courseInfo = `${course.course} <br> Batch ${course.batch} <br>  (${course.room})`;
+                                let courseInfo = `${course.course} <br> ${course.batch} <br>  (${course.room})`;
                                 if (course.classtype && course.date) {
                                     courseInfo += `<br><span style="color:red">(${course.classtype} class) <br>Date: ${course.date}</span>`;
                                     if (course.teacher == teacher) {
                                         courseInfo += `<br><button class="cancel-button" onclick="cancel('${courseInfo.day}','${courseInfo.slot}','${courseInfo.room}')">Cancel</button> </a>`;
                                     }
+                                } else {
+                                    courseInfo += `
+                                    <br>
+                                    <a> Makeup</a>
+                                    / 
+                                    <a>Extra class</a>
+                                    `;
                                 }
                                 return courseInfo;
                             })
@@ -165,7 +148,6 @@
                         alert("Error:" + error);
                     });
             }
-            
         </script>
     </body>
 </html>

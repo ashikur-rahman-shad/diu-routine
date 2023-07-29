@@ -18,7 +18,12 @@
 
  <html>
 
- <body style="text-align: center;">
+ <head>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="complete.css" />
+ </head>
+
+ <body>
      <div>
          <h1>DIU Routine -SWE</h1>
          <div class="top-navigation">
