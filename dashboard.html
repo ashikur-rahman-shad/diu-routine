@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="complete.css" />
+        <script src="./kawaii-ui/kawaii-ui.js"></script>
+        <script src="./scripts/complete.js" defer></script>
+        <script src="./scripts/rooms.js" defer></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                query = "teacher";
+                view="t";
+                loadRoutine();
+            });
+        </script>
     </head>
     <body>
         <div>
@@ -24,130 +32,11 @@
         <h2>Extra classes</h2>
         <div id="extra-class"></div>
 
-        <script>
-            var jsonData;
-            var temporaryData;
-            var query = "";
-            const url = "./data.php?";
-            const temporaryUrl = "./temporary-class.php?";
-            const section = document.getElementById("section");
-            const routineTable = document.getElementById("class-routine");
-
-            var teacher;
-            fetch("./teacher.php")
-                .then((response) => response.text())
-                .then((result) => {
-                    teacher = result;
-                    handleSubmit();
-                })
-                .catch((error) => {
-                    alert("Error:" + error);
-                });
-
-            function handleSubmit() {
-                query = url + "teacher=" + teacher;
-                temporaryQuery = temporaryUrl + "teacher=" + teacher;
-
-                // Fetch data from both URLs concurrently using Promise.all
-                Promise.all([
-                    fetch(query).then((response) => response.json()),
-                    fetch(temporaryQuery).then((response) => response.json()),
-                ])
-                    .then(([data, temporaryData]) => {
-                        jsonData = data;
-                        this.temporaryData = temporaryData;
-                        const mergedData = jsonData.concat(temporaryData);
-                        document.getElementById("class-routine").innerHTML =
-                            createTable(mergedData);
-                    })
-                    .catch((error) => {
-                        console.log("Error:", error);
-                    });
-            }
-
-            function createTableRow(day, slots) {
-                let row = "<tr><td>" + day + "</td>";
-
-                // Group courses by day and slot
-                let groupedCourses = {};
-                slots.forEach((course) => {
-                    const key = course.day + "_" + course.slot;
-                    if (!groupedCourses.hasOwnProperty(key)) {
-                        groupedCourses[key] = [];
-                    }
-                    groupedCourses[key].push(course);
-                });
-
-                for (let i = 1; i <= 9; i++) {
-                    const key = day + "_" + i;
-                    let courses = groupedCourses[key];
-                    if (courses) {
-                        row += "<td>";
-                        row += courses
-                            .map((course) => {
-                                let courseInfo = `${course.course} <br> ${course.batch} <br>  (${course.room})`;
-                                if (course.classtype && course.date) {
-                                    courseInfo += `<br><span style="color:red">(${course.classtype} class) <br>Date: ${course.date}</span>`;
-                                    if (course.teacher == teacher) {
-                                        courseInfo += `<br><button class="cancel-button" onclick="cancel('${courseInfo.day}','${courseInfo.slot}','${courseInfo.room}')">Cancel</button> </a>`;
-                                    }
-                                } else {
-                                    courseInfo += `
-                                    <br>
-                                    <a> Makeup</a>
-                                    / 
-                                    <a>Extra class</a>
-                                    `;
-                                }
-                                return courseInfo;
-                            })
-                            .join("<hr>");
-                        row += "</td>";
-                    } else {
-                        row += "<td></td>";
-                    }
-                }
-                row += "</tr>";
-                return row;
-            }
-
-            function groupByDay(dataArray) {
-                let groupedData = {};
-                dataArray.forEach((course) => {
-                    if (!groupedData.hasOwnProperty(course.day)) {
-                        groupedData[course.day] = [];
-                    }
-                    groupedData[course.day].push(course);
-                });
-                return groupedData;
-            }
-
-            function createTable(dataArray) {
-                const groupedData = groupByDay(dataArray);
-                let table =
-                    "<table><thead><tr><th>Days/Slots</th><th>Slot 1</th><th>Slot 2</th><th>Slot 3</th><th>Slot 4</th><th>Slot 5</th><th>Slot 6</th><th>Slot 7</th><th>Slot 8</th><th>Slot 9</th></tr></thead><tbody>";
-
-                for (const [day, slots] of Object.entries(groupedData)) {
-                    table += createTableRow(day, slots);
-                }
-
-                table += "</tbody></table>";
-                return table;
-            }
-
-            function cancel(day, slot, room) {
-                fetch(
-                    cancelURL + "day=" + day + "&slot=" + slot + "&room=" + room
-                )
-                    .then((response) => response.text())
-                    .then((result) => {
-                        alert(result);
-                        handleSubmit();
-                    })
-                    .catch((error) => {
-                        alert("Error:" + error);
-                    });
-            }
-        </script>
+        <div class="overlay">
+            <div class="popup-container">
+                <div class="popup-close">&times;</div>
+                <div id="booking-popup" class="popup-content"></div>
+            </div>
+        </div>
     </body>
 </html>

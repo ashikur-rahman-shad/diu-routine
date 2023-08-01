@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="./kawaii-ui/kawaii-ui.js" defer></script>
         <link rel="stylesheet" href="complete.css" />
     </head>
     <body>
@@ -25,10 +26,9 @@
 
         <script>
             var jsonData;
-            var temporaryData;
             var query = "";
             var teacher;
-            fetch("./teacher.php")
+            fetch("./api/teacher.php")
                 .then((response) => response.text())
                 .then((result) => {
                     teacher = result;
@@ -36,31 +36,23 @@
                 .catch((error) => {
                     alert("Error:" + error);
                 });
-            const url = "./data.php?";
-            const bookingURL = "./book.php?";
-            const temporaryUrl = "./temporary-class.php?";
-            const cancelURL = "./cancel.php?";
+            const url = "./api/data.php?";
+            const bookingURL = "./api/book.php?";
+            const cancelURL = "./api/cancel.php?";
             const input = document.getElementById("data");
             const routineTable = document.getElementById("class-routine");
 
             function handleSubmit() {
                 document.getElementById("class-routine").innerHTML = "";
                 query = url + "day=" + input.value;
-                query_temp = temporaryUrl + "day=" + input.value;
-                Promise.all([
-                    fetch(query).then((response) => response.json()),
-                    fetch(query_temp).then((response) => response.json()),
-                ])
-                    .then(([dataResponse, temporaryResponse]) => {
-                        jsonData = dataResponse;
-                        temporaryData = temporaryResponse;
-
-                        const mergedData = jsonData.concat(temporaryData);
-
+                fetch(query)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        jsonData = data;
                         const slots = new Set();
                         const rooms = new Set();
 
-                        mergedData.forEach((item) => {
+                        jsonData.forEach((item) => {
                             slots.add(item.slot);
                             rooms.add(item.room);
                         });
@@ -93,7 +85,7 @@
                             roomRow.appendChild(roomCell);
 
                             slotArray.forEach((slot) => {
-                                const coursesInSlotAndRoom = mergedData.filter(
+                                const coursesInSlotAndRoom = jsonData.filter(
                                     (item) =>
                                         item.slot === slot && item.room === room
                                 );
@@ -118,15 +110,6 @@
                                             cell.appendChild(courseDiv);
                                         }
                                     );
-                                } else {
-                                    const button =
-                                        document.createElement("button");
-                                    button.className = "book-button";
-                                    button.textContent = "Book the room";
-                                    button.onclick = function () {
-                                        book(room, slot, input.value);
-                                    };
-                                    cell.appendChild(button);
                                 }
 
                                 roomRow.appendChild(cell);

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="./kawaii-ui/kawaii-ui.js" defer></script>
+        <link rel="stylesheet" href="complete.css" />
+    </head>
+    <body>
+        <div>
+            <h1>DIU Routine - SWE</h1>
+            <div class="top-navigation">
+                <a href="./login.php"> Login</a> &bull;
+                <a href="./"> Home</a> &bull;
+                <a href="./dashboard.html"> Dashboard</a> &bull;
+                <a href="./day-slot-view.html"> Day wise routine</a> &bull;
+                <a href="./room-slot-view.html"> Room wise routine</a> &bull;
+                <br />
+                <br />
+            </div>
+        </div>
+        <label>
+            <input
+                type="radio"
+                name="role"
+                onchange="updatePlaceholder('t')"
+                value="teacher"
+            />
+            Teacher
+        </label>
+        <label>
+            <input
+                type="radio"
+                name="role"
+                onchange="updatePlaceholder('s')"
+                value="student"
+                checked
+            />
+            Student
+        </label>
+        <input type="text" id="data" placeholder="Enter batch" />
+        <input type="text" id="section" placeholder="Enter Section" />
+        <button onclick="handleSubmit()">Submit</button>
+        <div id="class-routine"></div>
+
+        <script>
+            var jsonData;
+            var temporaryData;
+            var query = "";
+            var mode = "s";
+            const url = "./api/data.php?";
+            const temporaryUrl = "./api/temporary-class.php?";
+            const input = document.getElementById("data");
+            const section = document.getElementById("section");
+            const routineTable = document.getElementById("class-routine");
+
+            var teacher;
+            fetch("./api/teacher.php")
+                .then((response) => response.text())
+                .then((result) => {
+                    teacher = result;
+                })
+                .catch((error) => {
+                    alert("Error:" + error);
+                });
+
+            function updatePlaceholder(x) {
+                mode = x;
+                input.value = "";
+                if (x == "t") {
+                    input.placeholder = "Enter Initial";
+                    section.style.display = "none";
+                } else {
+                    input.placeholder = "Enter batch no";
+                    section.style.display = "inline-block";
+                }
+                section.placeholder = "Enter Section";
+            }
+
+            function handleSubmit() {
+                const selectedRole = document.querySelector(
+                    'input[name="role"]:checked'
+                );
+
+                if (selectedRole.value == "teacher") {
+                    query = url + "teacher=" + input.value;
+                    temporaryQuery = temporaryUrl + "teacher=" + input.value;
+                } else {
+                    query = url + "batch=" + input.value;
+                    temporaryQuery = temporaryUrl + "batch=" + input.value;
+                    if (section.value.replace(/\s/g, "") != "") {
+                        query +=
+                            "&section=" +
+                            section.value.replace(/\s/g, "").toUpperCase();
+                        temporaryQuery +=
+                            "&section=" +
+                            section.value.replace(/\s/g, "").toUpperCase();
+                    }
+                }
+
+                console.log(query);
+                console.log(temporaryQuery);
+
+                // Fetch data from both URLs concurrently using Promise.all
+                Promise.all([
+                    fetch(query).then((response) => response.json()),
+                    fetch(temporaryQuery).then((response) => response.json()),
+                ])
+                    .then(([data, temporaryData]) => {
+                        jsonData = data;
+                        this.temporaryData = temporaryData;
+                        const mergedData = jsonData.concat(temporaryData);
+                        document.getElementById("class-routine").innerHTML =
+                            createTable(mergedData);
+                    })
+                    .catch((error) => {
+                        console.log("Error:", error);
+                    });
+            }
+
+            function createTableRow(day, slots) {
+                let row = "<tr><td>" + day + "</td>";
+
+                // Group courses by day and slot
+                let groupedCourses = {};
+                slots.forEach((course) => {
+                    const key = course.day + "_" + course.slot;
+                    if (!groupedCourses.hasOwnProperty(key)) {
+                        groupedCourses[key] = [];
+                    }
+                    groupedCourses[key].push(course);
+                });
+
+                for (let i = 1; i <= 9; i++) {
+                    const key = day + "_" + i;
+                    let courses = groupedCourses[key];
+                    if (courses) {
+                        row += "<td>";
+                        row += courses
+                            .map((course) => {
+                                let courseInfo = `${course.course}  <br> Room ${course.room}`;
+                                if (mode == "s")
+                                    courseInfo += `<br> ${course.teacher}`;
+                                else courseInfo += `<br> Batch ${course.batch}`;
+
+                                if (course.classtype && course.date) {
+                                    courseInfo += `<br><span style="color:red">(${course.classtype} class) <br>Date: ${course.date}</span>`;
+                                    if (course.teacher == teacher) {
+                                        courseInfo += `<br><button class="cancel-button" onclick="cancel('${courseInfo.day}','${courseInfo.slot}','${courseInfo.room}')">Cancel</button> </a>`;
+                                    }
+                                }
+                                return courseInfo;
+                            })
+                            .join("<hr>");
+                        row += "</td>";
+                    } else {
+                        row += "<td></td>";
+                    }
+                }
+                row += "</tr>";
+                return row;
+            }
+
+            function groupByDay(dataArray) {
+                let groupedData = {};
+                dataArray.forEach((course) => {
+                    if (!groupedData.hasOwnProperty(course.day)) {
+                        groupedData[course.day] = [];
+                    }
+                    groupedData[course.day].push(course);
+                });
+                return groupedData;
+            }
+
+            function createTable(dataArray) {
+                const groupedData = groupByDay(dataArray);
+                let table =
+                    "<table><thead><tr><th>Days/Slots</th><th>Slot 1</th><th>Slot 2</th><th>Slot 3</th><th>Slot 4</th><th>Slot 5</th><th>Slot 6</th><th>Slot 7</th><th>Slot 8</th><th>Slot 9</th></tr></thead><tbody>";
+
+                for (const [day, slots] of Object.entries(groupedData)) {
+                    table += createTableRow(day, slots);
+                }
+
+                table += "</tbody></table>";
+                return table;
+            }
+
+            function cancel(day, slot, room) {
+                fetch(
+                    cancelURL + "day=" + day + "&slot=" + slot + "&room=" + room
+                )
+                    .then((response) => response.text())
+                    .then((result) => {
+                        alert(result);
+                        handleSubmit();
+                    })
+                    .catch((error) => {
+                        alert("Error:" + error);
+                    });
+            }
+        </script>
+    </body>
+</html>

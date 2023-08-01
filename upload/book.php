@@ -6,17 +6,17 @@ $message = "You are not eligible to make these changes";
 
 if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) && isset($_GET['room']) && isset($_GET['course']) && isset($_GET['batch']) && isset($_GET['classtype'])) {
 
-    require './db-connect.php';
-    date_default_timezone_set('Asia/Dhaka');
+    require '../db-connect.php';
 
     $daysOfWeek = array('SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY');
-    $slots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    $result = sql("SELECT DISTINCT room FROM `diu_routine`;");
+    $slots = array();
+    $result = sql("SELECT DISTINCT slot FROM `slots`;");
+    while ($r = mysqli_fetch_assoc($result)) $slots[] = $r['slot'];
+
     $rooms = array();
-    while ($r = mysqli_fetch_assoc($result)) {
-        $rooms[] = $r['room'];
-    }
+    $result = sql("SELECT DISTINCT room FROM `rooms`;");
+    while ($r = mysqli_fetch_assoc($result)) $rooms[] = $r['room'];
 
     $day = strtoupper($_GET['day']);
     $slot = $_GET['slot'];
@@ -59,7 +59,7 @@ if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) &
                 $inputDay = $day;
                 $currentDate = date('Y-m-d');
 
-               
+
                 $currentDayOfWeek = strtoupper(date('l', strtotime($currentDate)));
 
                 $daysToAdd = (array_search($inputDay, $daysOfWeek) - array_search($currentDayOfWeek, $daysOfWeek) + 7) % 7;

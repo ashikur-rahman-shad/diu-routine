@@ -6,7 +6,7 @@ $message = "You are not eligible to make these changes";
 
 if (isset($_SESSION['teacher']) && isset($_GET['day']) && isset($_GET['slot']) && isset($_GET['room'])) {
 
-    require './db-connect.php';
+    require '../db-connect.php';
 
     $day = strtolower($_GET['day']);
     $slot = $_GET['slot'];
